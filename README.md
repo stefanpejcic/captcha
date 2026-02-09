@@ -1,6 +1,6 @@
 # captcha
 
-Captcha plugin for OpenPanel
+Captcha plugin for OpenPanel - discussion: https://github.com/stefanpejcic/OpenPanel/discussions/856
 
 Currently supported:
 - [Google reCAPTCHA](#google-recaptcha)
