@@ -1,0 +1,10 @@
+name = captcha
+title = Captcha
+description = Google reCAPTCHA v2, Cloudflare Turnstile, Custom CAPTCHA
+link = /login
+version = 1.0.0
+author = Stefan Pejcic
+category = 
+icon = 
+show_in_search = 0
+help_link = https://github.com/stefanpejcic/captcha/
