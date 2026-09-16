@@ -2,6 +2,8 @@
 
 Captcha plugin for OpenPanel - discussion: https://github.com/stefanpejcic/OpenPanel/discussions/856
 
+Ships as a standalone Go binary (`captcha`) that OpenPanel execs directly - no Python or other runtime required on the server. The binary is built by CI and committed to this repo, so installing is just cloning it.
+
 Currently supported:
 - [Google reCAPTCHA](#google-recaptcha)
 - [Cloudflare Turnstile](#cloudflare-turnstile)
@@ -74,7 +76,7 @@ Open OpenPanel login page and test.
 
 'Custom' option should be used by developers as a starting point to integrate a custom CAPTCHA into OpenPanel login page.
 
-Fork the [repo](https://github.com/stefanpejcic/captcha/), edit `_verify_custom` function and use your custom repo url in the next step.
+Fork the [repo](https://github.com/stefanpejcic/captcha/), edit the `verifyCustom` function in `main.go`, and use your custom repo url in the next step. Push to `main` and the build workflow rebuilds the `captcha` binary for you.
 
 ### 1. Install plugin
 ```bash
@@ -99,6 +101,16 @@ docker restart openpanel
 ### 5. Test
 Open OpenPanel login page and test.
 
+---
 
+## Plugin contract
 
+OpenPanel execs the plugin binary directly, once per call, and reads its stdout - the same pattern used for every other OpenPanel plugin. There are two subcommands:
 
+**`captcha widget`** - called when rendering the login page. Prints one line of JSON describing what to show:
+```json
+{"provider": "google", "field_name": "g-recaptcha-response", "site_key": "6Lc..."}
+```
+`provider` is `""` when no provider is configured - OpenPanel treats that as "don't show a captcha".
+
+**`captcha verify --token=<response_token> [--ip=<client_ip>]`** - called on login submission. Prints `{"success": true|false}` and exits `0` on success, non-zero on failure.

@@ -1,0 +1,37 @@
+name: Build
+
+# Builds the plugin binary and commits it straight into the repo, so
+# installing this plugin is just "git clone + chmod +x" - no compiler
+# needed on the OpenPanel server. Only runs when the Go source actually
+# changed, so it never re-triggers itself off its own commit.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -o captcha .
+
+      - name: Commit binary
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add captcha
+          git diff --staged --quiet || git commit -m "chore: rebuild captcha binary"
+          git push
